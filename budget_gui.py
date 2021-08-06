@@ -1,8 +1,9 @@
 from tkinter import *
+from PIL import ImageTk
 
 class BudgetGui(Frame):
     def __init__(self, master=None):
-        Frame.__init__(self, master)
+        super().__init__(master)
         self.button_dict = {
             'Create Expense': self.create_expense,
             'Show Expenses': self.show_expenses,
@@ -17,25 +18,26 @@ class BudgetGui(Frame):
         }
         self.yearly_expense_dict = {}
         self.master = master
+        self.menu_image = ImageTk.PhotoImage(file='C:\\Users\Chris\Documents\\VS_CODE_LEARNING\\BudgetApp\\money.jpg')
         self.pack()
         self.create_menu()
         self.create_buttons()
 
     def create_menu(self):
-        Label(self, text='Main Menu').pack(side=TOP)
+        Label(self, text='Budget App').pack(side=TOP, fill=BOTH)       
+        Label(self, image=self.menu_image).pack()
+        
+        
 
-# create generic toplevel window, use button_name dict to insert appropriate logic?
+# create buttons for root window from __init__ parameters
     def create_buttons(self):
         for button_name, func in self.button_dict.items():
-            Button(self, text=button_name, command=lambda button_name=button_name, func=func: self.create_toplevel(button_name, func)).pack(side=TOP)
+            Button(self, text=button_name, command=func).pack(side=TOP, fill=X)
 
-    def create_toplevel(self, button_name, func):
-        frame = Toplevel(self)
-        Label(frame, text=button_name).pack(side=TOP)
-        func(frame)
-
-    def create_expense(self, frame):
-        Label(frame, text='Please enter an expense to create').pack(side=TOP, fill=X)
+    def create_expense(self):
+        frame = Toplevel()
+        frame.focus()
+        Label(frame, text='Please enter an expense to create:').pack(side=TOP, fill=X)
         create_text = StringVar()
         Entry(frame, textvariable=create_text).pack(side=TOP)
         Button(frame, text='Add Amount', command=lambda: self.add_amount(frame, create_text)).pack(anchor=SE)
@@ -45,7 +47,7 @@ class BudgetGui(Frame):
         print(create_text.get())
         add_amount_text = StringVar()
         Entry(frame, textvariable=add_amount_text).pack(side=TOP)
-        Button(frame, text='Expense Frequency', command=lambda: self.expense_frequency_calc(frame, create_text, add_amount_text)).pack(anchor=SE)
+        Button(frame, text='Add Frequency', command=lambda: self.expense_frequency_calc(frame, create_text, add_amount_text)).pack(anchor=SE)
 
     def expense_frequency_calc(self, frame, create_text, add_amount_text):
         Label(frame, text='Please select expense frequency').pack(side=TOP)
@@ -58,19 +60,23 @@ class BudgetGui(Frame):
 
     def calculate_yearly_expense(self, frame, create_text, add_amount_text, freq_value):
         frame.destroy()
-        expense_amount = int(add_amount_text.get()) * int(freq_value.get())
-        self.yearly_expense_dict[create_text.get()] = expense_amount
+        expense_amount = int(add_amount_text.get()) * freq_value.get()
+        self.yearly_expense_dict[create_text.get().capitalize()] = expense_amount
         print(self.yearly_expense_dict)
         
 
     def show_expenses(self):
-        pass
+        frame = Toplevel()
+        for key, value in self.yearly_expense_dict.items():
+            Label(frame, text=f'{key}: {value}').pack(side=TOP, fill=X)
         
     def edit_expense(self):
-        pass
+        frame = Toplevel()
+        frame.focus()
 
     def delete_expense(self):
-        pass
+        frame = Toplevel()
+        frame.focus()
 
     def quit_button(self):
         pass
