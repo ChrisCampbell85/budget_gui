@@ -18,7 +18,8 @@ class BudgetGui(Frame):
         }
         self.yearly_expense_dict = {}
         self.master = master
-        self.menu_image = ImageTk.PhotoImage(file='C:\\Users\Chris\Documents\\VS_CODE_LEARNING\\BudgetApp\\money.jpg')
+        self.menu_image = ImageTk.PhotoImage(file='money.jpg')
+        self.show_amount_image = ImageTk.PhotoImage(file='money_bag.jpg')
         self.pack()
         self.create_menu()
         self.create_buttons()
@@ -27,36 +28,40 @@ class BudgetGui(Frame):
         Label(self, text='Budget App').pack(side=TOP, fill=BOTH)       
         Label(self, image=self.menu_image).pack()
         
-        
-
 # create buttons for root window from __init__ parameters
     def create_buttons(self):
         for button_name, func in self.button_dict.items():
             Button(self, text=button_name, command=func).pack(side=TOP, fill=X)
+        self.quit_button(frame=self)
 
     def create_expense(self):
         frame = Toplevel()
-        frame.focus()
+        frame.grab_set()
+        frame.focus_set()
         Label(frame, text='Please enter an expense to create:').pack(side=TOP, fill=X)
         create_text = StringVar()
         Entry(frame, textvariable=create_text).pack(side=TOP)
+        frame.bind('<Return>', lambda event: self.add_amount(frame, create_text))        
         Button(frame, text='Add Amount', command=lambda: self.add_amount(frame, create_text)).pack(anchor=SE)
+        
+        
         
     def add_amount(self, frame, create_text):
         Label(frame, text='Please enter amount').pack(side=TOP)
-        print(create_text.get())
         add_amount_text = StringVar()
         Entry(frame, textvariable=add_amount_text).pack(side=TOP)
         Button(frame, text='Add Frequency', command=lambda: self.expense_frequency_calc(frame, create_text, add_amount_text)).pack(anchor=SE)
+        frame.bind('<Return>', lambda event: self.expense_frequency_calc(frame, create_text, add_amount_text))        
 
     def expense_frequency_calc(self, frame, create_text, add_amount_text):
         Label(frame, text='Please select expense frequency').pack(side=TOP)
-        print(add_amount_text.get())
         freq_value = IntVar()
         for freq, value in self.expense_frequency.items():
             Radiobutton(frame, text=freq, variable=freq_value, value=value).pack(side=TOP)
         Button(frame, text='Save', command=lambda: self.calculate_yearly_expense(frame, create_text, add_amount_text, freq_value)).pack(anchor=SE)
-        
+        frame.bind('<Return>', lambda event: self.calculate_yearly_expense(frame, create_text, add_amount_text, freq_value))        
+        self.back_button(frame)
+        self.quit_button(frame)
 
     def calculate_yearly_expense(self, frame, create_text, add_amount_text, freq_value):
         frame.destroy()
@@ -67,22 +72,32 @@ class BudgetGui(Frame):
 
     def show_expenses(self):
         frame = Toplevel()
+        frame.grab_set()
+        Label(frame, text='Total Yearly Expenses').pack(side=TOP)
+        Label(frame, image=self.show_amount_image).pack(side=TOP)
         for key, value in self.yearly_expense_dict.items():
-            Label(frame, text=f'{key}: {value}').pack(side=TOP, fill=X)
+            Label(frame, text=f'{key}: ${value}').pack(side=LEFT, fill=X)
+        self.back_button(frame)
         
     def edit_expense(self):
         frame = Toplevel()
-        frame.focus()
+        frame.grab_set()
+        frame.focus_set()
 
     def delete_expense(self):
         frame = Toplevel()
-        frame.focus()
+        frame.grab_set()
+        frame.focus_set()
 
-    def quit_button(self):
-        pass
+    def quit_button(self, frame):
+        Button(frame, text='Quit', command=self.quit).pack(anchor=SE)
+
+    def back_button(self, frame):
+        Button(frame, text='Go Back', command=frame.destroy).pack(anchor=SE)
 
 
 if __name__ == '__main__':
     root = Tk()
+    root.title('Budget App')
     app = BudgetGui(root)
     app.mainloop()
