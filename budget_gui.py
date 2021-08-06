@@ -20,6 +20,8 @@ class BudgetGui(Frame):
         self.master = master
         self.menu_image = ImageTk.PhotoImage(file='money.jpg')
         self.show_amount_image = ImageTk.PhotoImage(file='money_bag.jpg')
+        self.edit_amount_image = ImageTk.PhotoImage(file='money_roll.jpg')
+        self.create_expense_image = ImageTk.PhotoImage(file='dollar_bill.jpg')
         self.pack()
         self.create_menu()
         self.create_buttons()
@@ -39,11 +41,11 @@ class BudgetGui(Frame):
         frame.grab_set()
         frame.focus_set()
         Label(frame, text='Please enter an expense to create:').pack(side=TOP, fill=X)
+        Label(frame, image=self.create_expense_image).pack(side=TOP)
         create_text = StringVar()
         Entry(frame, textvariable=create_text).pack(side=TOP)
-        frame.bind('<Return>', lambda event: self.add_amount(frame, create_text))        
         Button(frame, text='Add Amount', command=lambda: self.add_amount(frame, create_text)).pack(anchor=SE)
-        
+        frame.bind('<Return>', lambda event: self.add_amount(frame, create_text))        
         
         
     def add_amount(self, frame, create_text):
@@ -83,6 +85,13 @@ class BudgetGui(Frame):
         frame = Toplevel()
         frame.grab_set()
         frame.focus_set()
+        Label(frame, text='Edit Expenses').pack(side=TOP)
+        Label(frame, image=self.edit_amount_image).pack(side=TOP)
+        selection = StringVar()
+        for expense_type in self.yearly_expense_dict:
+            Radiobutton(frame, text=expense_type, variable=selection, value=expense_type).pack(side=TOP)
+        Button(frame, text='Edit Expense', command=lambda: self.add_amount(frame, selection)).pack(anchor=SE)
+        self.back_button(frame)
 
     def delete_expense(self):
         frame = Toplevel()
