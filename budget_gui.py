@@ -1,5 +1,11 @@
 from tkinter import *
+from tkinter import filedialog
 from PIL import ImageTk
+from save_to_db import pickle_expenses, unpickle_expenses
+
+# create export to csv function
+# create save function to sqlite database
+# create income input and budgeting functionality i.e. desired savings, savings totals etc
 
 class BudgetGui(Frame):
     def __init__(self, master=None):
@@ -16,7 +22,10 @@ class BudgetGui(Frame):
             'Monthly': 12,
             'Yearly': 1
         }
-        self.yearly_expense_dict = {}
+        self.fonts = {'button': ('Devanagari MT', 15, 'bold'),
+                        'title': ('Chalkboard SE', 20, 'bold')
+        }
+        self.yearly_expenses = {}
         self.master = master
         self.menu_image = ImageTk.PhotoImage(file='money.jpg')
         self.show_amount_image = ImageTk.PhotoImage(file='money_bag.jpg')
@@ -27,13 +36,29 @@ class BudgetGui(Frame):
         self.create_buttons()
 
     def create_menu(self):
-        Label(self, text='Budget App').pack(side=TOP, fill=BOTH)       
+        Label(self, text='Budget App', font=self.fonts['title']).pack(side=TOP, fill=BOTH)       
         Label(self, image=self.menu_image).pack()
+        Button(self, text='Open File', command=self.open_budget).pack(anchor=NE)
+        Button(self, text='Save File', command=self.save_budget).pack(anchor=NE)
+        
+
+    def open_budget(self):
+        filename = filedialog.askopenfilename()
+        file_load = unpickle_expenses(filename)
+        self.yearly_expenses = file_load
+        
+
+    def save_budget(self):
+        frame = Toplevel()
+        Label(frame, text='Type in filename').pack(side=TOP)
+        ent_var = StringVar()
+        Entry(frame, textvariable=ent_var).pack(side=TOP)
+        Button(frame, text='Save', command=lambda: pickle_expenses(self.yearly_expenses, ent_var.get(), frame)).pack(anchor=SE)
         
 # create buttons for root window from __init__ parameters
     def create_buttons(self):
         for button_name, func in self.button_dict.items():
-            Button(self, text=button_name, command=func).pack(side=TOP, fill=X)
+            Button(self, text=button_name, font=self.fonts['button'], command=func).pack(side=TOP, fill=X)
         self.quit_button(frame=self)
 
     def create_expense(self):
@@ -68,8 +93,9 @@ class BudgetGui(Frame):
     def calculate_yearly_expense(self, frame, create_text, add_amount_text, freq_value):
         frame.destroy()
         expense_amount = int(add_amount_text.get()) * freq_value.get()
-        self.yearly_expense_dict[create_text.get().capitalize()] = expense_amount
-        print(self.yearly_expense_dict)
+        self.yearly_expenses[create_text.get().capitalize()] = expense_amount
+        
+        print(self.yearly_expenses)
         
 
     def show_expenses(self):
@@ -77,7 +103,7 @@ class BudgetGui(Frame):
         frame.grab_set()
         Label(frame, text='Total Yearly Expenses').pack(side=TOP)
         Label(frame, image=self.show_amount_image).pack(side=TOP)
-        for key, value in self.yearly_expense_dict.items():
+        for key, value in self.yearly_expenses.items():
             Label(frame, text=f'{key}: ${value}').pack(side=LEFT, fill=X)
         self.back_button(frame)
         
@@ -88,7 +114,7 @@ class BudgetGui(Frame):
         Label(frame, text='Edit Expenses').pack(side=TOP)
         Label(frame, image=self.edit_amount_image).pack(side=TOP)
         selection = StringVar()
-        for expense_type in self.yearly_expense_dict:
+        for expense_type in self.yearly_expenses:
             Radiobutton(frame, text=expense_type, variable=selection, value=expense_type).pack(side=TOP)
         Button(frame, text='Edit Expense', command=lambda: self.add_amount(frame, selection)).pack(anchor=SE)
         self.back_button(frame)
@@ -103,7 +129,6 @@ class BudgetGui(Frame):
 
     def back_button(self, frame):
         Button(frame, text='Go Back', command=frame.destroy).pack(anchor=SE)
-
 
 if __name__ == '__main__':
     root = Tk()
