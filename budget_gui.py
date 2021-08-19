@@ -22,19 +22,20 @@ class BudgetGui(Frame):
             'Yearly': 1
         }
         self.fonts = {'button': ('Devanagari MT', 15, 'bold'),
-                        'title': ('Chalkboard SE', 20, 'bold'),
-                        'regular': ('Copperplate Gothic Light', 15, 'bold')
+                        'title': ('Sinhala Sangam MN', 20, 'bold'),
+                        'regular': ('Myanmar MN', 15, 'bold')
         }
-        self.yearly_expenses = {'Total': 0}
+        self.yearly_expenses = {}
         self.master = master
         self.menu_image = ImageTk.PhotoImage(file='money.jpg')
         self.show_amount_image = ImageTk.PhotoImage(file='money_bag.jpg')
         self.edit_amount_image = ImageTk.PhotoImage(file='money_roll.jpg')
         self.create_expense_image = ImageTk.PhotoImage(file='dollar_bill.jpg')
-        self.delete_expense_image = ImageTk.PhotoImage(file='burning_money.jpg')
+        self.delete_expense_image = ImageTk.PhotoImage(file='burning_money1.jpg')
         self.pack()
         self.create_menu('Budget App')
         self.create_buttons()
+
 
     def create_menu(self, name):
         Label(self, text=name, font=self.fonts['title']).pack(side=TOP, fill=BOTH)
@@ -49,6 +50,7 @@ class BudgetGui(Frame):
             file_load = unpickle_expenses(filename)
             self.yearly_expenses = file_load
 
+
     def save_budget(self):
         frame = Toplevel()
         Label(frame, text='Type in filename').pack(side=TOP)
@@ -56,11 +58,13 @@ class BudgetGui(Frame):
         Entry(frame, textvariable=ent_var).pack(side=TOP)
         Button(frame, text='Save', command=lambda: pickle_expenses(self.yearly_expenses, ent_var.get(), frame)).pack(anchor=SE)
         
+
 # create buttons for root window from __init__ parameters
     def create_buttons(self):
         for button_name, func in self.button_dict.items():
             Button(self, text=button_name, font=self.fonts['button'], command=func).pack(side=TOP, fill=X)
         self.quit_button(frame=self)
+
 
     def create_expense(self):
         frame = Toplevel()
@@ -81,6 +85,7 @@ class BudgetGui(Frame):
         Button(frame, text='Add Frequency', command=lambda: self.expense_frequency_calc(frame, create_text, add_amount_text)).pack(anchor=SE)
         frame.bind('<Return>', lambda event: self.expense_frequency_calc(frame, create_text, add_amount_text))        
 
+
     def expense_frequency_calc(self, frame, create_text, add_amount_text):
         Label(frame, text='Please select expense frequency').pack(side=TOP)
         freq_value = IntVar()
@@ -90,6 +95,7 @@ class BudgetGui(Frame):
         frame.bind('<Return>', lambda event: self.calculate_yearly_expense(frame, create_text, add_amount_text, freq_value))        
         self.back_button(frame)
         self.quit_button(frame)
+
 
     def calculate_yearly_expense(self, frame, create_text, add_amount_text, freq_value):
         frame.destroy()
@@ -102,10 +108,14 @@ class BudgetGui(Frame):
         frame.grab_set()
         Label(frame, text='Total Yearly Expenses', font=self.fonts['title']).pack(side=TOP)
         Label(frame, image=self.show_amount_image).pack(side=TOP)
+        total, line = 0, 40 * '-'
         for key, value in self.yearly_expenses.items():
-            Label(frame, text=f'{key}: ${value}', font=self.fonts['regular']).pack(side=TOP, fill=X, padx=10)
+            Label(frame, text=f'{key}: ${value}', font=self.fonts['regular']).pack(anchor=NW)
+            total += value
+        Label(frame, text=f'{line}\nTotal: ${total}', font=self.fonts['regular']).pack(anchor=NW)
         self.back_button(frame)
         
+
     def edit_expense(self):
         frame = Toplevel()
         frame.grab_set()
@@ -113,26 +123,43 @@ class BudgetGui(Frame):
         Label(frame, text='Edit Expenses').pack(side=TOP)
         Label(frame, image=self.edit_amount_image).pack(side=TOP)
         selection = StringVar()
+        selection.set(None)
         for expense_type in self.yearly_expenses:
-            Radiobutton(frame, text=expense_type, variable=selection, value=expense_type).pack(side=TOP, fill=X, ipadx=1)
+            Radiobutton(frame, text=expense_type, variable=selection, value=expense_type, font=self.fonts['regular']).pack(anchor=NW)
         Button(frame, text='Edit Expense', command=lambda: self.add_amount(frame, selection)).pack(anchor=SE)
         self.back_button(frame)
 
-    # This needs work
+
     def delete_expense(self):
         frame = Toplevel()
-        Label(frame, text="Which expense would you like to delete?", image=self.delete_expense_image).pack(side=TOP)
+        user_selection = []
+        Label(frame, text="Which expense would you like to delete?", image=self.delete_expense_image, font=self.fonts['title']).pack(side=TOP)
         for expense in self.yearly_expenses.keys():
             selection = StringVar()
-            Radiobutton(frame, text=expense, variable=selection, value=expense).pack(anchor=NW)
+            selection.set(None)
+            Radiobutton(frame, text=expense, variable=selection, value=expense, font=self.fonts['regular']).pack(anchor=NW)
+            user_selection.append(selection)
+        Button(frame, text='Delete', font=self.fonts['regular'], command=lambda: self.delete(frame, user_selection)).pack(anchor=SE)
+        Button(frame, text='Reset', font=self.fonts['regular'], command=lambda: self.reset(user_selection)).pack(anchor=SE)
         self.back_button(frame)
 
-    def validate_delete(self, user_selections):
-        for expense in user_selections:
-            print(expense)
+    def delete(self, frame, user_selection):
+        for item in user_selection:
+            item = item.get()
+            if item in self.yearly_expenses.keys():
+                self.yearly_expenses.pop(item)
+        frame.destroy()
 
+
+    def reset(self, user_selection):
+        for item in user_selection:
+            item.set(None)
+        user_selection = []
+
+        
     def quit_button(self, frame):
         Button(frame, text='Quit', command=self.quit).pack(anchor=SE)
+
 
     def back_button(self, frame):
         Button(frame, text='Go Back', command=frame.destroy).pack(anchor=SE)
