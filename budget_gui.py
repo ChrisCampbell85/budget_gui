@@ -22,7 +22,7 @@ class BudgetGui(Frame):
             'Yearly': 1
         }
         self.fonts = {'button': ('Devanagari MT', 15, 'bold'),
-                        'title': ('Sinhala Sangam MN', 20, 'bold'),
+                        'title': ('Gill Sans MT', 18, 'bold'),
                         'regular': ('Myanmar MN', 15, 'bold')
         }
         self.yearly_expenses = {}
@@ -70,7 +70,7 @@ class BudgetGui(Frame):
         frame = Toplevel()
         frame.grab_set()
         frame.focus_set()
-        Label(frame, text='Please enter an expense to create:').pack(side=TOP, fill=X)
+        Label(frame, text='Please enter an expense to create:', font=self.fonts['title']).pack(side=TOP, fill=X)
         Label(frame, image=self.create_expense_image).pack(side=TOP)
         create_text = StringVar()
         Entry(frame, textvariable=create_text).pack(side=TOP)
@@ -90,7 +90,7 @@ class BudgetGui(Frame):
         Label(frame, text='Please select expense frequency').pack(side=TOP)
         freq_value = IntVar()
         for freq, value in self.expense_frequency.items():
-            Radiobutton(frame, text=freq, variable=freq_value, value=value).pack(side=TOP, fill=Y)
+            Radiobutton(frame, text=freq, variable=freq_value, value=value).pack(anchor=NW)
         Button(frame, text='Save', command=lambda: self.calculate_yearly_expense(frame, create_text, add_amount_text, freq_value)).pack(anchor=SE)
         frame.bind('<Return>', lambda event: self.calculate_yearly_expense(frame, create_text, add_amount_text, freq_value))        
         self.back_button(frame)
@@ -114,13 +114,13 @@ class BudgetGui(Frame):
             total += value
         Label(frame, text=f'{line}\nTotal: ${total}', font=self.fonts['regular']).pack(anchor=NW)
         self.back_button(frame)
-        
+        self.quit_button(frame)
 
     def edit_expense(self):
         frame = Toplevel()
         frame.grab_set()
         frame.focus_set()
-        Label(frame, text='Edit Expenses').pack(side=TOP)
+        Label(frame, text='Edit Expenses', font=self.fonts['title']).pack(side=TOP)
         Label(frame, image=self.edit_amount_image).pack(side=TOP)
         selection = StringVar()
         selection.set(None)
@@ -154,7 +154,6 @@ class BudgetGui(Frame):
     def reset(self, user_selection):
         for item in user_selection:
             item.set(None)
-        user_selection = []
 
         
     def quit_button(self, frame):
