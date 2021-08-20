@@ -10,6 +10,7 @@ class BudgetGui(Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.button_dict = {
+            'Enter Income': self.enter_income,
             'Create Expense': self.create_expense,
             'Show Expenses': self.show_expenses,
             'Edit Expenses': self.edit_expense,
@@ -65,6 +66,16 @@ class BudgetGui(Frame):
             Button(self, text=button_name, font=self.fonts['button'], command=func).pack(side=TOP, fill=X)
         self.quit_button(frame=self)
 
+    def enter_income(self):
+        frame = Toplevel()
+        frame.grab_set()
+        frame.focus_set()
+        Label(frame, text='Enter your income:', font=self.fonts['title']).pack(side=TOP)
+        income = StringVar()
+        Entry(frame, textvariable=income).pack(side=TOP)
+        Button(frame, text='Add Frequency', command=lambda: self.expense_frequency_calc(frame, 'Income', income)).pack(anchor=SE)
+        frame.bind('<Return>', lambda event: self.expense_frequency_calc(frame, 'Income', income))
+ 
 
     def create_expense(self):
         frame = Toplevel()
@@ -99,8 +110,10 @@ class BudgetGui(Frame):
 
     def calculate_yearly_expense(self, frame, create_text, add_amount_text, freq_value):
         frame.destroy()
+        if create_text != "Income":
+            create_text = create_text.get()
         expense_amount = int(add_amount_text.get()) * freq_value.get()
-        self.yearly_expenses[create_text.get().capitalize()] = expense_amount
+        self.yearly_expenses[create_text.capitalize()] = expense_amount
         
 
     def show_expenses(self):
