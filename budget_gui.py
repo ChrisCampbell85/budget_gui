@@ -11,8 +11,8 @@ class BudgetGui(Frame):
         super().__init__(master)
         self.button_dict = {
             'Enter Income': self.enter_income,
+            'Show Budget': self.show_budget,
             'Create Expense': self.create_expense,
-            'Show Expenses': self.show_expenses,
             'Edit Expenses': self.edit_expense,
             'Delete Expenses': self.delete_expense
         }
@@ -66,6 +66,7 @@ class BudgetGui(Frame):
             Button(self, text=button_name, font=self.fonts['button'], command=func).pack(side=TOP, fill=X)
         self.quit_button(frame=self)
 
+
     def enter_income(self):
         frame = Toplevel()
         frame.grab_set()
@@ -116,18 +117,26 @@ class BudgetGui(Frame):
         self.yearly_expenses[create_text.capitalize()] = expense_amount
         
 
-    def show_expenses(self):
+    def show_budget(self):
         frame = Toplevel()
         frame.grab_set()
         Label(frame, text='Total Yearly Expenses', font=self.fonts['title']).pack(side=TOP)
         Label(frame, image=self.show_amount_image).pack(side=TOP)
-        total, line = 0, 40 * '-'
+        total, line = 0, 50 * '-'
         for key, value in self.yearly_expenses.items():
-            Label(frame, text=f'{key}: ${value}', font=self.fonts['regular']).pack(anchor=NW)
-            total += value
-        Label(frame, text=f'{line}\nTotal: ${total}', font=self.fonts['regular']).pack(anchor=NW)
+            if key != 'Income':
+                Label(frame, text=f'* {key}: ${value}', font=self.fonts['regular']).pack(anchor=NW)
+                total += value
+        Label(frame, text=f'{line}\n').pack(anchor=NW)
+        Label(frame, text=f'Total Expenses: ${total}', font=self.fonts['regular']).pack(anchor=NW)
+        self.income_less_expenses(frame, total)
         self.back_button(frame)
         self.quit_button(frame)
+
+    def income_less_expenses(self, frame, total):
+        if 'Income' in self.yearly_expenses:
+            net = self.yearly_expenses['Income'] - total
+            Label(frame, text=f'Net Savings: ${net}', font=self.fonts['regular']).pack(anchor=NW)
 
     def edit_expense(self):
         frame = Toplevel()
@@ -138,7 +147,8 @@ class BudgetGui(Frame):
         selection = StringVar()
         selection.set(None)
         for expense_type in self.yearly_expenses:
-            Radiobutton(frame, text=expense_type, variable=selection, value=expense_type, font=self.fonts['regular']).pack(anchor=NW)
+            if expense_type != 'Income':
+                Radiobutton(frame, text=expense_type, variable=selection, value=expense_type, font=self.fonts['regular']).pack(anchor=NW)
         Button(frame, text='Edit Expense', command=lambda: self.add_amount(frame, selection)).pack(anchor=SE)
         self.back_button(frame)
 
@@ -155,6 +165,7 @@ class BudgetGui(Frame):
         Button(frame, text='Delete', font=self.fonts['regular'], command=lambda: self.delete(frame, user_selection)).pack(anchor=SE)
         Button(frame, text='Reset', font=self.fonts['regular'], command=lambda: self.reset(user_selection)).pack(anchor=SE)
         self.back_button(frame)
+
 
     def delete(self, frame, user_selection):
         for item in user_selection:
@@ -175,6 +186,7 @@ class BudgetGui(Frame):
 
     def back_button(self, frame):
         Button(frame, text='Go Back', command=frame.destroy).pack(anchor=SE)
+
 
 if __name__ == '__main__':
     root = Tk()
