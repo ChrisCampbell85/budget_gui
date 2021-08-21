@@ -6,8 +6,11 @@ from save_to_db import pickle_expenses, unpickle_expenses
 # create export to csv function
 # create income input and budgeting functionality i.e. desired savings, savings totals etc
 
+"""
+This class setups up an tkinter GUI for a simple budgeting app. Mappings for functions, media and name are created at initialization
+"""
 class BudgetGui(Frame):
-    def __init__(self, master=None):
+    def __init__(self, master=None, app_title=None):
         super().__init__(master)
         self.button_dict = {
             'Enter Income': self.enter_income,
@@ -26,6 +29,7 @@ class BudgetGui(Frame):
                         'title': ('Gill Sans MT', 18, 'bold'),
                         'regular': ('Myanmar MN', 15, 'bold')
         }
+        self.app_title = app_title
         self.yearly_expenses = {}
         self.master = master
         self.menu_image = ImageTk.PhotoImage(file='money.jpg')
@@ -34,12 +38,12 @@ class BudgetGui(Frame):
         self.create_expense_image = ImageTk.PhotoImage(file='dollar_bill.jpg')
         self.delete_expense_image = ImageTk.PhotoImage(file='burning_money1.jpg')
         self.pack()
-        self.create_menu('Budget App')
+        self.create_menu()
         self.create_buttons()
 
 
-    def create_menu(self, name):
-        Label(self, text=name, font=self.fonts['title']).pack(side=TOP, fill=BOTH)
+    def create_menu(self):
+        Label(self, text=self.app_title, font=self.fonts['title']).pack(side=TOP, fill=BOTH)
         Label(self, image=self.menu_image).pack()
         Button(self, text='Open File', command=self.open_budget).pack(anchor=NE)
         Button(self, text='Save File', command=self.save_budget).pack(anchor=NE)
@@ -186,10 +190,3 @@ class BudgetGui(Frame):
 
     def back_button(self, frame):
         Button(frame, text='Go Back', command=frame.destroy).pack(anchor=SE)
-
-
-if __name__ == '__main__':
-    root = Tk()
-    root.title('Budget App')
-    app = BudgetGui(root)
-    app.mainloop()

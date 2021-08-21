@@ -1,5 +1,9 @@
 import pickle
 
+"""
+Functions for persisting data from budget_gui.py
+"""
+
 def pickle_expenses(data, filename, frame=None):
     save_file = open(f'{filename}.pkl', 'wb')
     pickle.dump(data, save_file)
