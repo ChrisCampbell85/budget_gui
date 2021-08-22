@@ -40,7 +40,7 @@ class BudgetGui(Frame):
         self.pack()
         self.create_menu()
         self.create_buttons()
-
+        
 
     def create_menu(self):
         Label(self, text=self.app_title, font=self.fonts['title']).pack(side=TOP, fill=BOTH)
@@ -102,6 +102,7 @@ class BudgetGui(Frame):
         frame.bind('<Return>', lambda event: self.expense_frequency_calc(frame, create_text, add_amount_text))        
 
 
+    # options for expense frequency, mapped in __init__
     def expense_frequency_calc(self, frame, create_text, add_amount_text):
         Label(frame, text='Please select expense frequency').pack(side=TOP)
         freq_value = IntVar()
@@ -113,6 +114,7 @@ class BudgetGui(Frame):
         self.quit_button(frame)
 
 
+    # calculate expenses, excluding income value
     def calculate_yearly_expense(self, frame, create_text, add_amount_text, freq_value):
         frame.destroy()
         if create_text != "Income":
@@ -121,6 +123,7 @@ class BudgetGui(Frame):
         self.yearly_expenses[create_text.capitalize()] = expense_amount
         
 
+    # shows all expenses, totals, and net result
     def show_budget(self):
         frame = Toplevel()
         frame.grab_set()
@@ -137,10 +140,12 @@ class BudgetGui(Frame):
         self.back_button(frame)
         self.quit_button(frame)
 
+
     def income_less_expenses(self, frame, total):
         if 'Income' in self.yearly_expenses:
             net = self.yearly_expenses['Income'] - total
             Label(frame, text=f'Net Savings: ${net}', font=self.fonts['regular']).pack(anchor=NW)
+
 
     def edit_expense(self):
         frame = Toplevel()
@@ -170,7 +175,7 @@ class BudgetGui(Frame):
         Button(frame, text='Reset', font=self.fonts['regular'], command=lambda: self.reset(user_selection)).pack(anchor=SE)
         self.back_button(frame)
 
-
+    # delete button function
     def delete(self, frame, user_selection):
         for item in user_selection:
             item = item.get()
@@ -178,12 +183,12 @@ class BudgetGui(Frame):
                 self.yearly_expenses.pop(item)
         frame.destroy()
 
-
+    # reset delete frame selections
     def reset(self, user_selection):
         for item in user_selection:
             item.set(None)
 
-        
+    # quit program
     def quit_button(self, frame):
         Button(frame, text='Quit', command=self.quit).pack(anchor=SE)
 

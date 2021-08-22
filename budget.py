@@ -128,7 +128,8 @@ class Budget:
         print(f'Net funds:\n${net}')
 
 
-
+if __name__ == '__main__':
+    Budget().expenses.add_expense()
 
 
 
