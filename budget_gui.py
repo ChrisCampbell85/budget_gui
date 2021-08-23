@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 from PIL import ImageTk
 from save_to_db import pickle_expenses, unpickle_expenses
 
@@ -39,30 +39,47 @@ class BudgetGui(Frame):
         self.create_expense_image = ImageTk.PhotoImage(file='.//pics//dollar_bill.jpg')
         self.delete_expense_image = ImageTk.PhotoImage(file='.//pics//burning_money1.jpg')
         self.pack()
-        self.create_menu()
-        self.create_buttons()
-
-
-    def create_menu(self):
-        Label(self, text=self.app_title, font=self.fonts['title']).pack(side=TOP, fill=BOTH)
-        Label(self, image=self.menu_image).pack()
-        Button(self, text='Open File', command=self.open_budget).pack(anchor=NE)
-        Button(self, text='Save File', command=self.save_budget).pack(anchor=NE)
+        self.create_or_open()
+        
         
 
+    # option to open new or existing budget
+    def create_or_open(self):
+        answer = messagebox.askquestion('Welcome!', 'Click \'Yes\' to OPEN existing budget\n Or \'No\' to CREATE new budget')
+        if answer == 'yes':
+            self.open_budget()
+        else:
+            self.save_budget(init=True)
+        
+    # open existing budget, passes filename to menu title
     def open_budget(self):
         filename = filedialog.askopenfilename()
         if filename:
             file_load = unpickle_expenses(filename)
             self.yearly_expenses = file_load
+            new_title = filename.split('/')[-1].rstrip('.pkl').capitalize()
+            self.create_menu(new_title)
 
-
-    def save_budget(self):
+    # save budget of existing if init=False, otherwise creates new file
+    def save_budget(self, init=False):
         frame = Toplevel()
-        Label(frame, text='Type in filename').pack(side=TOP)
+        Label(frame, text='Type in filename of your budget').pack(side=TOP)
         ent_var = StringVar()
         Entry(frame, textvariable=ent_var).pack(side=TOP)
-        Button(frame, text='Save', command=lambda: pickle_expenses(self.yearly_expenses, ent_var.get(), frame)).pack(anchor=SE)
+        if init:
+            Button(frame, text='Create', command=lambda: self.create_menu(ent_var.get().capitalize(), frame, init=True)).pack(anchor=SE)
+        else:
+            Button(frame, text='Save', command=lambda: pickle_expenses(self.yearly_expenses, ent_var.get(), frame)).pack(anchor=SE)
+
+    # if init=True, saves new filename and creates menu with filename as title
+    def create_menu(self, name, frame=None, init=False):
+        if init:
+            pickle_expenses(self.yearly_expenses, name.lower(), frame)
+        Label(self, text=name, font=self.fonts['title']).pack(side=TOP, fill=BOTH)
+        Label(self, image=self.menu_image).pack()
+        Button(self, text='Open File', command=self.open_budget).pack(anchor=NE)
+        Button(self, text='Save File', command=self.save_budget).pack(anchor=NE)
+        self.create_buttons()
         
 
 # create buttons for root window from __init__ parameters
@@ -185,7 +202,7 @@ class BudgetGui(Frame):
                 self.yearly_expenses.pop(item)
         frame.destroy()
 
-    # reset delete frame selections
+    # reset delete frame user selections
     def reset(self, user_selection):
         for item in user_selection:
             item.set(None)
