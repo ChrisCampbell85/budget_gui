@@ -32,15 +32,16 @@ class BudgetGui(Frame):
         self.app_title = app_title
         self.yearly_expenses = {}
         self.master = master
-        self.menu_image = ImageTk.PhotoImage(file='money.jpg')
-        self.show_amount_image = ImageTk.PhotoImage(file='money_bag.jpg')
-        self.edit_amount_image = ImageTk.PhotoImage(file='money_roll.jpg')
-        self.create_expense_image = ImageTk.PhotoImage(file='dollar_bill.jpg')
-        self.delete_expense_image = ImageTk.PhotoImage(file='burning_money1.jpg')
+        self.income_image = ImageTk.PhotoImage(file='.//pics//money_sack.jpg')
+        self.menu_image = ImageTk.PhotoImage(file='.//pics//money.jpg')
+        self.show_amount_image = ImageTk.PhotoImage(file='.//pics//money_bag.jpg')
+        self.edit_amount_image = ImageTk.PhotoImage(file='.//pics//money_roll.jpg')
+        self.create_expense_image = ImageTk.PhotoImage(file='.//pics//dollar_bill.jpg')
+        self.delete_expense_image = ImageTk.PhotoImage(file='.//pics//burning_money1.jpg')
         self.pack()
         self.create_menu()
         self.create_buttons()
-        
+
 
     def create_menu(self):
         Label(self, text=self.app_title, font=self.fonts['title']).pack(side=TOP, fill=BOTH)
@@ -76,6 +77,7 @@ class BudgetGui(Frame):
         frame.grab_set()
         frame.focus_set()
         Label(frame, text='Enter your income:', font=self.fonts['title']).pack(side=TOP)
+        Label(frame, image=self.income_image).pack(side=TOP)
         income = StringVar()
         Entry(frame, textvariable=income).pack(side=TOP)
         Button(frame, text='Add Frequency', command=lambda: self.expense_frequency_calc(frame, 'Income', income)).pack(anchor=SE)
